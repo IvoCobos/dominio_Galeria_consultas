@@ -1,0 +1,210 @@
+-- Table: public.escultores
+
+-- DROP TABLE public.escultores;
+
+CREATE TABLE public.escultores
+(
+    id integer NOT NULL,
+    "id_Persona" integer NOT NULL,
+    CONSTRAINT escultores_pkey PRIMARY KEY (id),
+    CONSTRAINT id_nombre_escultor FOREIGN KEY ("id_Persona")
+        REFERENCES public.persona (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.escultores
+    OWNER to ivan;
+
+-- Index: fki_id_nombre_escultor
+
+-- DROP INDEX public.fki_id_nombre_escultor;
+
+CREATE INDEX fki_id_nombre_escultor
+    ON public.escultores USING btree
+    ("id_Persona")
+    TABLESPACE pg_default;
+
+-- Table: public.esculturas
+
+-- DROP TABLE public.esculturas;
+
+CREATE TABLE public.esculturas
+(
+    id integer NOT NULL,
+    "id_Escultor" integer NOT NULL,
+    nombre_escultura character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "id_Sala" integer NOT NULL,
+    tecnica character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT esculturas_pkey PRIMARY KEY (id),
+    CONSTRAINT id_escultor FOREIGN KEY ("id_Escultor")
+        REFERENCES public.escultores (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT id_sala_escultura FOREIGN KEY ("id_Sala")
+        REFERENCES public.salas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.esculturas
+    OWNER to ivan;
+
+-- Index: fki_id_escultor
+
+-- DROP INDEX public.fki_id_escultor;
+
+CREATE INDEX fki_id_escultor
+    ON public.esculturas USING btree
+    ("id_Escultor")
+    TABLESPACE pg_default;
+
+-- Index: fki_id_sala_escultura
+
+-- DROP INDEX public.fki_id_sala_escultura;
+
+CREATE INDEX fki_id_sala_escultura
+    ON public.esculturas USING btree
+    ("id_Sala")
+    TABLESPACE pg_default;
+
+-- Table: public.persona
+
+-- DROP TABLE public.persona;
+
+CREATE TABLE public.persona
+(
+    id integer NOT NULL,
+    nombre character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "fecha_Nac" date,
+    nacionalidad character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT id_persona PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.persona
+    OWNER to ivan;
+
+-- Table: public.pintores
+
+-- DROP TABLE public.pintores;
+
+CREATE TABLE public.pintores
+(
+    id integer NOT NULL,
+    "id_Persona" integer NOT NULL,
+    "numero_Pinturas" numeric(5,0) NOT NULL,
+    CONSTRAINT pintores_pkey PRIMARY KEY (id),
+    CONSTRAINT id_nombre_pintor FOREIGN KEY ("id_Persona")
+        REFERENCES public.persona (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.pintores
+    OWNER to ivan;
+
+-- Index: fki_id_nombre_pintor
+
+-- DROP INDEX public.fki_id_nombre_pintor;
+
+CREATE INDEX fki_id_nombre_pintor
+    ON public.pintores USING btree
+    ("id_Persona")
+    TABLESPACE pg_default;
+
+-- Table: public.pinturas
+
+-- DROP TABLE public.pinturas;
+
+CREATE TABLE public.pinturas
+(
+    id integer NOT NULL,
+    "id_Pintores" integer NOT NULL,
+    "nombre_Pintura" character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    "id_Sala" integer NOT NULL,
+    tecnica character varying(50) COLLATE pg_catalog."default",
+    CONSTRAINT pinturas_pkey PRIMARY KEY (id),
+    CONSTRAINT id_pintura FOREIGN KEY ("id_Pintores")
+        REFERENCES public.pintores (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT id_sala_pintura FOREIGN KEY ("id_Sala")
+        REFERENCES public.salas (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.pinturas
+    OWNER to ivan;
+
+-- Index: fki_id_pintura
+
+-- DROP INDEX public.fki_id_pintura;
+
+CREATE INDEX fki_id_pintura
+    ON public.pinturas USING btree
+    ("id_Pintores")
+    TABLESPACE pg_default;
+
+-- Index: fki_id_sala_pintura
+
+-- DROP INDEX public.fki_id_sala_pintura;
+
+CREATE INDEX fki_id_sala_pintura
+    ON public.pinturas USING btree
+    ("id_Sala")
+    TABLESPACE pg_default;
+
+-- Table: public.salas
+
+-- DROP TABLE public.salas;
+
+CREATE TABLE public.salas
+(
+    id integer NOT NULL,
+    nombre_sala character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    ubicacion_sala character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT salas_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.salas
+    OWNER to ivan;
+
+-- CONSULTA FUNCIONES AGREGADOS
+
+SELECT * SUM (id)
+	FROM pintores
+
+SELECT * AVG(id)
+	FROM escultores
+
+SELECT * MAX (numero_pinturas)
+	FROM pintores
+
+SELECT numero_pinturas, COUNT (*) AS PINTORES
+	FROM pintores
+	GROUP BY numero_pinturas
